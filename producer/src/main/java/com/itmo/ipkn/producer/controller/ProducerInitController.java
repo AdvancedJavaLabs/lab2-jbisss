@@ -20,9 +20,9 @@ public class ProducerInitController {
         producerInitService.initWordCounter(fileSize, word);
     }
 
-    @GetMapping("/init/TopN")
-    public void initTopN(@PathParam("fileSize") String fileSize) {
-        producerInitService.initTopN(fileSize);
+    @GetMapping("/init/TopN/{n}")
+    public void initTopN(@PathParam("fileSize") String fileSize, @PathVariable int n) {
+        producerInitService.initTopN(fileSize, n);
     }
 
     @GetMapping("/init/SentimentAnalyzer")
