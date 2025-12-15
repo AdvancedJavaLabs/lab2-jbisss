@@ -22,6 +22,7 @@ public class SorterOutputListener {
             sorterAggregation = SorterAggregation.aggregationMap.get(taskId);
         } else {
             sorterAggregation = new SorterAggregation(taskId);
+            SorterAggregation.aggregationMap.put(taskId, sorterAggregation);
         }
 
         sorterAggregation.handleMessage(messageId, sortedSentencesBody, messageType, timeIfHas);

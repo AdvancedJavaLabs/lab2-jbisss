@@ -1,8 +1,11 @@
 package com.itmo.ipkn.aggregator.aggregation;
 
+import org.apache.logging.log4j.util.PropertySource;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -12,7 +15,9 @@ public class SorterAggregation {
 
     public static final Map<Integer, SorterAggregation> aggregationMap = new ConcurrentHashMap<>();
 
-    private final PriorityBlockingQueue<String> queue = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<String> queue = new PriorityBlockingQueue<>(10,
+            Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder())
+    );
 
     private int lastMessageId = -1;
     private final AtomicInteger messageCounter = new AtomicInteger(0);
@@ -37,7 +42,6 @@ public class SorterAggregation {
         } else if (messageType.equals("first")) {
             startTime = Long.parseLong(timeIfHas);
         }
-
         if(andGet == lastMessageId){
             printResultToFile();
         }
@@ -46,7 +50,7 @@ public class SorterAggregation {
     private void printResultToFile() {
         System.out.println("Task proceeded for " + (System.currentTimeMillis() - startTime) + "ms.");
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./output/sorted_" + this.taskId + ".txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("sorted_" + this.taskId + ".txt"))) {
             String element;
             while ((element = queue.poll()) != null) {
                 writer.write(element);

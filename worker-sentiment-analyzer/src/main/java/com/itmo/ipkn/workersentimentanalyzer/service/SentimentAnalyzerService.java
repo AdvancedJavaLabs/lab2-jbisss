@@ -35,6 +35,7 @@ public class SentimentAnalyzerService {
         double resultCoef = analyze(textLine);
 
         String outputMessage = taskId + "|" + messageId + "|" + resultCoef + "|" + messageType + "|" + timeIfHas;
+        System.out.println("Handling message " + messageId);
         rabbitTemplate.convertAndSend("sentimentAnalyzerQueueOutput", outputMessage);
     }
 

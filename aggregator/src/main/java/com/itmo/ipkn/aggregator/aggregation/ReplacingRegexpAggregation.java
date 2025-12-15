@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -25,7 +26,7 @@ public class ReplacingRegexpAggregation {
     public ReplacingRegexpAggregation(int taskId, String tempFilePath) {
         this.taskId = taskId;
         try {
-            this.tempFilePath = Files.createTempFile("./output/" + tempFilePath, ".tmp");
+            this.tempFilePath = Files.createFile(Path.of(tempFilePath));
             this.tempFileWriter = Files.newBufferedWriter(this.tempFilePath, StandardOpenOption.APPEND);
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,8 +42,8 @@ public class ReplacingRegexpAggregation {
         }
         if (andGet == lastMessageId) {
             try {
-                String finalFileName = "./output/final_result_for_task_" + taskId;
-                finalizeFile(Files.createTempFile(finalFileName, ".tmp"));
+                String finalFileName = "final_result_for_task_" + taskId;
+                finalizeFile(Files.createFile(Path.of(finalFileName)));
                 System.out.println("Task " + taskId + " has been processed.");
                 System.out.println("Watch file: " + finalFileName);
                 System.out.println("For: " + (System.currentTimeMillis() - startTime) + "ms.");
@@ -53,13 +54,13 @@ public class ReplacingRegexpAggregation {
     }
 
     private void finalizeFile(Path finalOutputPath) throws IOException {
-        tempFileWriter.close();
+        //tempFileWriter.close();
 
         List<String> lines = Files.readAllLines(tempFilePath);
 
         lines.sort((s1, s2) -> {
-            Long num1 = Long.parseLong(s1.split("\\|", 2)[0]);
-            Long num2 = Long.parseLong(s2.split("\\|", 2)[0]);
+            Long num1 = Long.parseLong(s1.split(":", 2)[0]);
+            Long num2 = Long.parseLong(s2.split(":", 2)[0]);
             return num1.compareTo(num2);
         });
 
@@ -67,7 +68,8 @@ public class ReplacingRegexpAggregation {
                 .map(line -> line.split(":", 2)[1])
                 .collect(Collectors.toList());
 
-        Files.write(finalOutputPath, sortedMessagesOnly, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Path path = Files.write(finalOutputPath, sortedMessagesOnly, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        System.out.println(path);
         Files.delete(tempFilePath);
     }
 

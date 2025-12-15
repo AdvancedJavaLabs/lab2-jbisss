@@ -39,6 +39,10 @@ public class SorterService {
 
         String messageToSend = taskId + SEPARATOR + messageId + SEPARATOR + sortedMessageBody + SEPARATOR + messageType + SEPARATOR + timeIfHas;
 
+        if (messageType.equals("last")) {
+            System.out.println("!!!!!!!!!");
+        }
+
         rabbitTemplate.convertAndSend("sorterQueueOutput", messageToSend);
         System.out.println("Handled message: " + messageId);
     }

@@ -27,6 +27,7 @@ public class SentimentAnalyzerOutputListener {
             aggregator = aggregatorMap.get(taskId);
         } else {
             aggregator = new SentimentAnalyzerAggregator(taskId);
+            aggregatorMap.put(taskId, aggregator);
         }
         aggregator.handleMessage(messageId, messageCoef, messageType, timeIfHas);
     }

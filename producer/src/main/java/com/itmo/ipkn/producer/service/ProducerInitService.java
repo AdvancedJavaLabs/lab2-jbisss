@@ -192,6 +192,8 @@ public class ProducerInitService {
 
             if (!sentenceBatch.isEmpty()) {
                 sendBatch(taskId, counter.getAndIncrement(), sentenceBatch, queueName, isFirstBatch, true);
+            } else {
+                sendBatch(taskId, counter.getAndIncrement(), List.of("1"), queueName, isFirstBatch, true);
             }
 
         } catch (IOException e) {

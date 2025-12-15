@@ -19,7 +19,7 @@ public class ReplacingRegexpService {
     // Группа 1 (\\s|[.!?]) захватывает разделитель (пробел ИЛИ . ! ?)
     // Группа 2 ([А-ЯЁ][а-яё]+)\\b захватывает само слово
     // ^| перед всем выражением позволяет найти первое слово в строке
-    private static final Pattern PATTERN = Pattern.compile("(^|\\s|[.!?])([А-ЯЁ][а-яё]+)\\b");
+    private static final Pattern PATTERN = Pattern.compile("(^|[.!?])([А-ЯЁ][а-яё]+)\\b");
     private static final Random RANDOM = new Random();
 
     private final RabbitTemplate rabbitTemplate;
@@ -49,36 +49,12 @@ public class ReplacingRegexpService {
                 .append("|")
                 .append(timeIfHas);
 
-        rabbitTemplate.convertAndSend("replaceRegexQueueOutput", outputMessage);
+        System.out.println("Handling message " + messageId);
+        rabbitTemplate.convertAndSend("replaceRegexQueueOutput", outputMessage.toString());
     }
 
     public String replaceProperNounsSmartly(String text) {
-        Matcher matcher = PATTERN.matcher(text);
-        StringBuilder result = new StringBuilder();
-        int lastEnd = 0;
-
-        while (matcher.find()) {
-            result.append(text, lastEnd, matcher.start());
-
-            String separatorOrStart = matcher.group(1);
-            String foundWord = matcher.group(2);
-
-            boolean isStartOfSentence = separatorOrStart.matches("[.!?]|\\s$|^$");
-
-            if (isStartOfSentence) {
-                result.append(separatorOrStart);
-                result.append(foundWord);
-            } else {
-                String replacementWord = getRandomWord();
-                result.append(separatorOrStart);
-                result.append(replacementWord.substring(0, 1).toUpperCase() + replacementWord.substring(1).toLowerCase());
-            }
-
-            lastEnd = matcher.end();
-        }
-
-        result.append(text, lastEnd, text.length());
-        return result.toString();
+        return text.replaceAll("\\b[А-ЯЁA-Z][а-яёa-z]*\\b", getRandomWord());
     }
 
     private String getRandomWord() {
